@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Events\MessageSent;
+use App\Models\Messages;
 
 class ChatController extends Controller
 {
@@ -18,10 +19,19 @@ class ChatController extends Controller
             'message' => 'required|string|max:1000'
         ]);
 
-        $message = $request->input('message');
+        $messageText = $request->input('message');
 
-        broadcast(new MessageSent($message))->toOthers();
-        \Log::info('Bericht verzonden');
+        // $sessionId = session()->getId();
+        $message = Messages::create([
+            'room_id' => 1,
+            'sender_id' => 1, 
+            'original_text' => $messageText,
+            'translated_text' => null,
+            'target_language' => null,
+        ]);
+
+        broadcast(new MessageSent($messageText))->toOthers();
+        \Log::info('Bericht verzonden',$message->toArray());
 
         return response()->json([
             'status' => 'ok'

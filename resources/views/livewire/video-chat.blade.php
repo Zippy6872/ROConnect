@@ -126,6 +126,19 @@
                 },
 
                 async init() {
+                     window.Echo.channel('chat')
+                    .listen('.MessageSent', (e) => {
+                        console.log('Ontvangen:', e.message);
+
+                        // this.messages.push({
+                        //     sender: 'Stranger',
+                        //     text: e.message
+                        // });
+
+                        this.$nextTick(() => {
+                            this.$refs.chatLog.scrollTop = this.$refs.chatLog.scrollHeight;
+                        });
+                    });
                     console.log('[System] Initializing VideoChat for:', this.userId);
                     await this.startCamera();
                     
@@ -215,6 +228,9 @@
 
                 sendMessage() {
                     if(this.newMessage.trim()) {
+                            axios.post('/send-message', {
+                            message: this.newMessage
+                        });
                         this.messages.push({ sender: 'You', text: this.newMessage });
                         this.newMessage = '';
                         this.$nextTick(() => { this.$refs.chatLog.scrollTop = this.$refs.chatLog.scrollHeight; });
